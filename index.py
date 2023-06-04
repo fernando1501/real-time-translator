@@ -1,10 +1,17 @@
 from googletrans import Translator
 from flask import Flask, render_template, request, send_from_directory
 from flask_cors import CORS
+from threading import Thread
 import os
 import json
+import speech_recognition as sr
 current_text = ''
 langs = ['es', 'en']
+
+recognizer = sr.Recognizer()
+
+recognizer.energy_threshold = 300
+recognizer.phrase_time_limit = 15
 
 translator = Translator()
 
@@ -25,11 +32,6 @@ def serve(path):
         return send_from_directory(app.static_folder, path)
     else:
         return send_from_directory(app.static_folder, 'index.html')
-
-# @app.route("/")
-# def index():
-#     global current_text
-#     return render_template('index.html', current_text=current_text)
 
 @app.route('/translate', methods=['GET', 'DELETE'])
 def translate():
@@ -70,5 +72,47 @@ def getText():
         "text": current_text
     }
 
+@app.route('/mics', methods=['GET'])
+def get_microphones():
+    micsIntern = []
+    microphones = sr.Microphone.list_working_microphones()
+    for device_index, name in enumerate(sr.Microphone.list_microphone_names()):
+        micsIntern.append({
+            "id": str(device_index),
+            "name": name,
+        })
+    return {
+        "microphones": micsIntern
+    }
+
+def main():
+    configData = getJsonFile('config.json')
+    global current_text
+    if configData.get('deviceId') != None:
+        mic = sr.Microphone(device_index=int(configData.get('deviceId')))
+    else:
+        mic = sr.Microphone()
+    with mic as source:
+        recognizer.adjust_for_ambient_noise(source)
+        while True:
+            try:
+                recorded_audio = recognizer.listen(source)
+                text = recognizer.recognize_google(
+                    recorded_audio,
+                    language=configData["src_lang"])
+                translated = translator.translate(
+                    text, src=configData["src_lang"], dest=configData["target_lang"]
+                )
+                current_text = translated.text
+            except Exception as e:
+                current_text = ''
+
+class CustomThread(Thread):
+    def run(self):
+        while True:
+            main()
+
 if __name__ == "__main__":
+    thread = CustomThread()
+    thread.start()
     app.run(port=4000)

@@ -29,17 +29,20 @@ export const Config = () => {
     };
     useEffect(() => {
         const getMics = async () => {
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const audioDevices = devices.filter((device) => device.kind === 'audioinput');
-            setMics(audioDevices)
-        }
-        fetch(`${getBaseUrl()}/config`)
-            .then((data) => data.json())
-            .then((result) => {
-                setForm((prev) => ({ ...prev, ...result }))
-            })
+            const devicesResponse = await fetch(`${getBaseUrl()}/mics`);
+            const devices = await devicesResponse.json()
+            setMics(devices.microphones)
 
-        getMics()
+        }
+        const getConfig = async () => {
+            const configResponse = await fetch(`${getBaseUrl()}/config`);
+            const result = await configResponse.json()
+            setForm((prev) => ({ ...prev, ...result }))
+        }
+        Promise.all([
+            getMics(),
+            getConfig()
+        ])
     }, [])
 
     return (
@@ -63,8 +66,8 @@ export const Config = () => {
             <FormGroup>
                 <label>Microfono</label>
                 <Selector value={form.deviceId} name="deviceId" onChange={onChange}>
-                    {mics.map(({ label, deviceId }) => (
-                        <Option value={deviceId}>{label}</Option>
+                    {mics.map(({ name, id }) => (
+                        <Option value={id}>{name}</Option>
                     ))}
                 </Selector>
             </FormGroup>
