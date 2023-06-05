@@ -103,6 +103,7 @@ def main():
                 socketio.emit('change-text', {"current_text": current_text})
             except Exception as e:
                 current_text = ''
+                socketio.emit('change-text', {"current_text": ""})
 
 class CustomThread(Thread):
     def run(self):
