@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { getBaseUrl } from '../utils';
+import { socket } from '../utils/sockets';
 const Container = styled.div`
   width: 100%;
   position: absolute;
@@ -21,15 +21,13 @@ export const Home = () => {
     const [transcript, setTranscript] = useState()
 
     useEffect(() => {
-        const getTextFile = () => {
-            fetch(`${getBaseUrl()}/text`)
-                .then((result) => result.json())
-                .then(({ text }) => {
-                    setTranscript(text)
-                    setTimeout(getTextFile, 200)
-                })
+        const onChangeText = (data) => {
+            setTranscript(data.current_text)
         }
-        getTextFile()
+        socket.on('change-text', onChangeText)
+        return () => {
+            socket.off('change-text', onChangeText)
+        }
     }, [])
 
     return (

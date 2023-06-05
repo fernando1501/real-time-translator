@@ -5,6 +5,8 @@ from threading import Thread
 import os
 import json
 import speech_recognition as sr
+from flask_socketio import SocketIO
+
 current_text = ''
 langs = ['es', 'en']
 
@@ -24,6 +26,7 @@ app = Flask(__name__, static_folder='build')
 
 CORS(app)
 
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -66,16 +69,9 @@ def config():
         configData = getJsonFile('config.json')
         return configData
 
-@app.route("/text", methods=['GET'])
-def getText():
-    return {
-        "text": current_text
-    }
-
 @app.route('/mics', methods=['GET'])
 def get_microphones():
     micsIntern = []
-    microphones = sr.Microphone.list_working_microphones()
     for device_index, name in enumerate(sr.Microphone.list_microphone_names()):
         micsIntern.append({
             "id": str(device_index),
@@ -104,6 +100,7 @@ def main():
                     text, src=configData["src_lang"], dest=configData["target_lang"]
                 )
                 current_text = translated.text
+                socketio.emit('change-text', {"current_text": current_text})
             except Exception as e:
                 current_text = ''
 
