@@ -38,7 +38,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "bundle": "esbuild index.js  --bundle --outfile=bundle.js --format=cjs --platform=node && npx pkg .\\package.json"
+    "bundle-windows": "esbuild index.js  --bundle --outfile=bundle.js --format=cjs --platform=node && npx pkg .\\package.json",
+    "bundle-lin": "esbuild index.js  --bundle --outfile=bundle.js --format=cjs --platform=node && npx pkg ./package.json"
   },
   "eslintConfig": {
     "extends": [
