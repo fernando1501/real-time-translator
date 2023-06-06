@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs').promises;
+const fsNormal = require('fs');
 const path = require('path');
 const cors = require('cors');
 const axios = require('axios');
@@ -9,6 +10,15 @@ const app = express();
 const buildPath = path.join(__dirname, 'build');
 const http = require('http');
 const server = http.createServer(app);
+
+const configPath = path.resolve('./config.json')
+
+if (!fsNormal.existsSync(configPath)) {
+  fsNormal.writeFileSync(configPath, JSON.stringify({
+    "src_lang": "es",
+    "target_lang": "en"
+  }));
+}
 
 const io = new socket.Server(server, { cors: { origin: '*' } });
 
@@ -20,7 +30,7 @@ app.use(express.static(buildPath));
 
 app.get('/config', async (req, res) => {
   try {
-    const data = await fs.readFile('config.json', 'utf8');
+    const data = await fs.readFile(configPath, 'utf8');
     const config = JSON.parse(data);
     res.json(config);
   } catch (err) {
@@ -33,11 +43,11 @@ app.get('/config', async (req, res) => {
 app.post('/config', async (req, res) => {
   const { name, value } = req.body;
   try {
-    const data = await fs.readFile('config.json', 'utf8');
+    const data = await fs.readFile(configPath, 'utf8');
     const config = JSON.parse(data);
     config[name] = value;
     const updatedConfig = JSON.stringify(config, null, 2);
-    await fs.writeFile('config.json', updatedConfig, 'utf8');
+    await fs.writeFile(configPath, updatedConfig, 'utf8');
     res.send('Configuración actualizada con éxito');
   } catch (err) {
     console.error('Error al actualizar el archivo config.json:', err);
@@ -79,4 +89,4 @@ server.listen(port, () => {
   console.log(`Servidor iniciado en el puerto ${port}`);
 });
 
-io.on("connection", (socket) => {});
+io.on("connection", (socket) => { });
