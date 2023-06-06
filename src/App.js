@@ -10,7 +10,7 @@ function App() {
     {
       path: '/configs',
       Component: Config,
-    }
+    },
   ])
   return (
     <RouterProvider router={router}/>

@@ -8,11 +8,10 @@ const Selector = styled("select")``
 const Option = styled("option")``
 
 export const Config = () => {
-    const [mics, setMics] = useState([])
     const [form, setForm] = useState({
         src_lang: '',
         target_lang: '',
-        deviceId: '',
+        mic: '',
     })
     const onChange = ({ target }) => {
         setForm((prev) => ({ ...prev, [target.name]: target.value }))
@@ -28,19 +27,12 @@ export const Config = () => {
         }).then(() => { });
     };
     useEffect(() => {
-        const getMics = async () => {
-            const devicesResponse = await fetch(`${getBaseUrl()}/mics`);
-            const devices = await devicesResponse.json()
-            setMics(devices.microphones)
-
-        }
         const getConfig = async () => {
             const configResponse = await fetch(`${getBaseUrl()}/config`);
             const result = await configResponse.json()
             setForm((prev) => ({ ...prev, ...result }))
         }
         Promise.all([
-            getMics(),
             getConfig()
         ])
     }, [])
@@ -60,14 +52,6 @@ export const Config = () => {
                 <Selector value={form.target_lang} name="target_lang" onChange={onChange}>
                     {langs.map(({ label, value }) => (
                         <Option value={value}>{label}</Option>
-                    ))}
-                </Selector>
-            </FormGroup>
-            <FormGroup>
-                <label>Microfono</label>
-                <Selector value={form.deviceId} name="deviceId" onChange={onChange}>
-                    {mics.map(({ name, id }) => (
-                        <Option value={id}>{name}</Option>
                     ))}
                 </Selector>
             </FormGroup>
