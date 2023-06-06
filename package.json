@@ -55,5 +55,14 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "pkg": {
+    "assets": "build/**/*",
+    "targets": [
+      "node16-macos",
+      "node16-win"
+    ],
+    "outputPath": "dist"
+  },
+  "bin" : "./index.js"
 }
