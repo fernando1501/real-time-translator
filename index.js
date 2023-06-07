@@ -63,10 +63,10 @@ app.post('/translate', async (req, res) => {
     const response = await axios.get(url);
     const translatedText = response.data;
 
-    const translatedJoinedSentences = translatedText.sentences
-      .filter((s) => 'trans' in s)
-      .map(s => s.trans)
-      .join('')
+    const translatedJoinedSentences = translatedText?.sentences ? translatedText?.sentences
+      ?.filter((s) => 'trans' in s)
+      ?.map(s => s.trans)
+      ?.join('') : '';
 
     io.emit('change-text', { text: translatedJoinedSentences })
 
