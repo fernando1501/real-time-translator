@@ -46471,7 +46471,7 @@ app.post("/translate", async (req, res) => {
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&dt=at&dt=bd&dt=ex&dt=ld&dt=md&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&hl=en&ie=UTF-8&oe=UTF-8&otf=1&q=${encodeURIComponent(text)}&sl=es&ssel=0&tk=xxxx&tl=en&tsel=0&dj=1`;
     const response = await axios.get(url);
     const translatedText = response.data;
-    const translatedJoinedSentences = translatedText.sentences.filter((s) => "trans" in s).map((s) => s.trans).join("");
+    const translatedJoinedSentences = translatedText?.sentences ? translatedText?.sentences?.filter((s) => "trans" in s)?.map((s) => s.trans)?.join("") : "";
     io.emit("change-text", { text: translatedJoinedSentences });
     res.json({
       text: translatedJoinedSentences
