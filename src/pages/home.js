@@ -49,7 +49,7 @@ export const Home = () => {
     useEffect(() => {
         if (!isObs) {
             const cleanRecognizer = () => {
-                if (recognition && !active) {
+                if (recognition) {
                     recognition.stop();
                     recognition.onresult = null;
                     recognition.onend = null;
@@ -59,11 +59,13 @@ export const Home = () => {
             }
             const startNewRegognition = () => {
                 if (active) {
-                    const newRecognition = new window.webkitSpeechRecognition();
-                    newRecognition.continuous = true;
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+                    const newRecognition = new SpeechRecognition();
+                    newRecognition.continuous = false;
                     newRecognition.interimResults = false;
                     newRecognition.lang = configs.src_lang;
                     newRecognition.onresult = async (event) => {
+                        console.log('New result')
                         clearTimeout(timeOut.current)
                         const speechText = event.results[event.results.length - 1][0].transcript;
                         await fetch(`${getBaseUrl()}/translate`, {
@@ -77,9 +79,9 @@ export const Home = () => {
                         })
                     };
                     newRecognition.onend = () => {
+                        console.log('Reconocimiento de voz finalizado');
                         cleanRecognizer()
                         startNewRegognition()
-                        console.log('Reconocimiento de voz finalizado');
                     };
                     setRecognition(newRecognition);
                     newRecognition.start();
@@ -89,7 +91,7 @@ export const Home = () => {
             startNewRegognition()
         }
         // eslint-disable-next-line
-    }, [configs.src_lang, active]);
+    }, [configs.src_lang, active, isObs]);
 
     useEffect(() => {
         const cleanTranscription = () => {
@@ -101,7 +103,7 @@ export const Home = () => {
             const wordCount = words.length;
             const minutes = wordCount / averageWordsPerMinute;
             const silenceThreshold = minutes * 60 * 1000;
-            return silenceThreshold;
+            return silenceThreshold < 2000 ? 2000 : silenceThreshold;
         }
         const handleChangeText = ({ text }) => {
             setTranscript(text)
