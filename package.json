@@ -39,18 +39,16 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "build:react:electron:win": "set PUBLIC_URL=./&& react-scripts build",
-    "build:react:electron:mac": "export PUBLIC_URL=\"./\"&& react-scripts build",
     "electron:only": "export $(cat .electron.env | xargs) && electron .",
     "electron:start": "concurrently \"npm start\" \"wait-on http://localhost:3000 && npm run electron:only\"",
     "electron:build": "electron-builder -c.extraMetadata.main=electron/main.js",
+    "build:react:electron:win": "set PUBLIC_URL=./&& react-scripts build",
+    "build:react:electron:mac": "export PUBLIC_URL=\"./\"&& react-scripts build",
     "electron:build:publish": "electron-builder -c.extraMetadata.main=electron/main.js --publish always",
-    "electron:prebuild:win": "set PUBLIC_URL=./&& copy .\\bin\\index.js .\\node_modules\\appium\\node_modules\\io.appium.settings\\index.js && copy .\\node_modules\\appium\\node_modules\\io.appium.settings\\apks\\settings_apk-debug.apk .\\bin\\settings_apk-debug.apk",
-    "electron:prebuild:mac": "./copy-bin",
-    "electron:build:win": "npm run electron:prebuild:win && npm run build:react:electron:win && npm run electron:build",
-    "electron:build:mac": "npm run electron:prebuild:mac && npm run build:react:electron:mac && npm run electron:build",
-    "electron:publish:win": "npm run electron:prebuild:win && npm run build:react:electron:win && npm run electron:build:publish",
-    "electron:publish:mac": "npm run electron:prebuild:mac && npm run build:react:electron:mac && npm run electron:build:publish"
+    "electron:build:win": "npm run build:react:electron:win && npm run electron:build",
+    "electron:build:mac": "npm run build:react:electron:mac && npm run electron:build",
+    "electron:publish:win": "npm run build:react:electron:win && npm run electron:build:publish",
+    "electron:publish:mac": "npm run build:react:electron:mac && npm run electron:build:publish"
   },
   "eslintConfig": {
     "extends": [
