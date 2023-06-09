@@ -1,4 +1,5 @@
 const express = require('express');
+const electron = require('electron');
 const fs = require('fs').promises;
 const fsNormal = require('fs');
 const path = require('path');
@@ -7,11 +8,13 @@ const axios = require('axios');
 const socket = require("socket.io")
 
 const app = express();
-const buildPath = path.join(__dirname, 'build');
+const buildPath = path.join(__dirname, '../build');
 const http = require('http');
 const server = http.createServer(app);
 
-const configPath = path.resolve('./config.json')
+const userDataPath = electron.app.getPath('userData');
+
+const configPath = path.resolve(userDataPath, 'rtt-config.json')
 
 if (!fsNormal.existsSync(configPath)) {
   fsNormal.writeFileSync(configPath, JSON.stringify({
@@ -89,4 +92,6 @@ server.listen(port, () => {
   console.log(`Servidor iniciado en el puerto ${port}`);
 });
 
-io.on("connection", (socket) => { });
+module.exports = {
+  port
+}
