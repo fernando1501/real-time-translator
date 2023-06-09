@@ -1,6 +1,6 @@
 {
   "name": "real-time-translator",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "repository": {
     "type": "git",
@@ -47,8 +47,8 @@
     "electron:build:publish": "electron-builder -c.extraMetadata.main=electron/main.js --publish always",
     "electron:build:win": "npm run build:react:electron:win && npm run electron:build",
     "electron:build:mac": "npm run build:react:electron:mac && npm run electron:build",
-    "electron:publish:win": "npm run build:react:electron:win && npm run electron:build:publish",
-    "electron:publish:mac": "npm run build:react:electron:mac && npm run electron:build:publish"
+    "electron:publish:win": "export $(cat .deploy.env | xargs) && npm run build:react:electron:win && npm run electron:build:publish",
+    "electron:publish:mac": "export $(cat .deploy.env | xargs) && npm run build:react:electron:mac && npm run electron:build:publish"
   },
   "eslintConfig": {
     "extends": [
